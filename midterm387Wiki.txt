@@ -1,0 +1,117 @@
+This project uses three arduinos in order to find a set of wavelengths that satisfy a function.
+One arduino Mega is used as the master. 
+The other two arduinos are Uno's, and they are the slaves.
+
+The goal: 
+
+1) To use multiple arduinos for the purpose of computing in parallel.
+2) To use a set of natural numbers (called wavelengths) to describe a binary set of 
+data. This could be used as a method of encryption or, in some cases, compression
+of the original data. 
+
+
+The function:
+
+The original data is binary. Each element is '1' or '0'.
+
+The function is rather simple. To compute, three pieces of information are required.
+Those are - the size of the original data, the number of 1's in the original data,
+and a wavelength set.
+
+To begin, a set of data is created. Same length as the original data, and all
+elements are initialized to 0. Call it tryData[dataLength].
+The computation progresses one wavelength at a time. Let j = -1. For each wavelength,
+j is increased by the magnitude of the wavelength. Then, the value of the index
+tryData[j] is incremented by 1. This continues for that wavelength until 
+j >= dataLength. Then, we do the same with the next wavelength. 
+Once all wavelengths have been used, we use the knowledge of the number of 1's 
+in the original data to determine which indices of tryData should become 1,
+and which should become 0. Say there are 5 1's in the original data. Then the
+5 indices in tryData with the largest values (elements nearer the back of tryData
+are favored in the event of a tie) are set as 1, and the smaller indices are set
+to 0. 
+
+The set that is produced from this function is compared to the original data. A
+better set of wavelengths is one that produces data which is more similar to
+the original data than another set of wavelengths.
+
+
+The evolution process:
+
+The Mega does none of the actual computing to find the set of wavelengths. 
+That task is left to the Unos. The Mega keeps track of the best set of 
+wavelengths currently found by the Unos. Continuously, the Mega receives 
+the updated sets from the Unos, compares those sets to the best set, 
+and sends the best set back to the unos.
+
+The best set is found by a simple evolution process. 
+One wavelength is mutated. It is either incremented or decremented.
+If this new set is better than the best set, meaning it describes
+the original data more accurately as an input to the function than the best set,
+then it becomes the best set.
+
+compareWaves(theseWaves[], thoseWaves[]) returns true if theseWaves are better than
+thoseWaves, and returns false otherwise.
+Both the Unos and the Mega compare waves to the best wave.
+All arduinos have their own instance of a best set.
+
+When the Mega requests an Uno send its best set, it does so by sending the Uno '9', 
+one byte. When the Mega sends its best set to an Uno, it simply sends 
+it over without any notice. Then, Serial.available() becomes true, and the Uno
+recognizes this. So, the Uno takes the set sent by the Mega and compares it to its
+own best set. If compareWaves() returns true, then that set becomes the best set.
+
+This process continues indefinitely. The progress of the set evolution can be seen
+by simply sending 's' to the Mega's Serial port. This prints out, from the Mega,
+the original data, the best set of wavelengths, and the data that is produced when
+the best set is given as an input to the function.
+
+Notes:
+
+This is not a finished project. The code still has errors, and so does not work 
+the way described. tryData[] is not computed correctly. Thus, the evolution process
+has no means of determining whether adaptations are beneficial or not.
+What does work, however, is the communication between the Unos and the Mega.
+So, the primary goal of this project, to use arduinos in parallel, is 
+fulfilled.
+
+Misc. Details:
+
+Both Unos use the same script. The Mega uses a different script.
+The Mega is able to communicate directly in Serial with at least 3 separate 
+other arduinos. The Unos, however, may only communicate with 1 other, each.
+
+Conclusion:
+
+I hope to soon be able to use many more cheap microprocessors in parallel.
+I believe it is a cheap way to compute something, and it is a great way to 
+learn about microprocessors and C language.
+This project was very fun and interesting to work on; I may even go back
+and perfect the code when I get a chance.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
